@@ -1,0 +1,20 @@
+{
+  "name": "cesium-korean-service",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/JSeungHO/cesium-korean-service#readme",
+  "bugs": {
+    "url": "https://github.com/JSeungHO/cesium-korean-service/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JSeungHO/cesium-korean-service.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
