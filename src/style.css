@@ -55,6 +55,21 @@ body {
   z-index: 10001;
 }
 
+.map-info-banner {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  max-width: min(420px, calc(100vw - 360px));
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(15, 23, 42, 0.92);
+  color: #bae6fd;
+  font-size: 0.84rem;
+  pointer-events: auto;
+  z-index: 10001;
+}
+
 .layer-panel {
   position: fixed;
   top: 16px;

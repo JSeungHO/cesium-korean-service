@@ -56,6 +56,14 @@ function getVWorldApiKey() {
   return rawKey?.replace(/^['"]|['"]$/g, '').trim();
 }
 
+function getVWorldBaseUrl() {
+  if (import.meta.env.DEV) {
+    return '/vworld/req/wmts/1.0.0';
+  }
+
+  return 'https://api.vworld.kr/req/wmts/1.0.0';
+}
+
 export function createVWorldImageryProvider(layerName = 'Base') {
   const apiKey = getVWorldApiKey();
   if (!apiKey) {
@@ -63,16 +71,18 @@ export function createVWorldImageryProvider(layerName = 'Base') {
   }
 
   const layer = VWORLD_LAYERS[layerName] ?? VWORLD_LAYERS.Base;
+  const baseUrl = getVWorldBaseUrl();
 
   return new UrlTemplateImageryProvider({
-    url: `https://api.vworld.kr/req/wmts/1.0.0/${apiKey}/${layer.type}/{z}/{reverseY}/{x}.${layer.format}`,
+    url: `${baseUrl}/${apiKey}/${layer.type}/{z}/{y}/{x}.${layer.format}`,
     tilingScheme: new WebMercatorTilingScheme(),
+    minimumLevel: 6,
     maximumLevel: 19,
     credit: new Credit('© VWorld'),
-    customTags: {
-      reverseY(_imageryProvider, _x, y, level) {
-        return (1 << level) - y - 1;
-      },
-    },
   });
+}
+
+export function isLocalDevelopment() {
+  return import.meta.env.DEV
+    && ['localhost', '127.0.0.1'].includes(window.location.hostname);
 }

@@ -8,19 +8,22 @@ import {
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 import {
   createVWorldImageryProvider,
+  isLocalDevelopment,
   setTerrainEnabled,
 } from './layers/layerManager.js';
 import { createLayerPanel } from './ui/layerPanel.js';
 import './style.css';
 
-function showMapError(message) {
+function showBanner(message, type = 'error') {
   const root = document.getElementById('ui-root');
   if (!root) {
     return;
   }
 
   const banner = document.createElement('div');
-  banner.className = 'map-error-banner';
+  banner.className = type === 'info'
+    ? 'map-info-banner'
+    : 'map-error-banner';
   banner.textContent = message;
   root.prepend(banner);
 }
@@ -50,21 +53,34 @@ function init() {
     mount: document.getElementById('ui-root'),
   });
 
+  if (isLocalDevelopment()) {
+    showBanner(
+      '로컬 개발 모드: VWorld 타일은 dev 프록시로 요청합니다. 지도가 비어 있으면 VWorld 인증키에 http://localhost:5173 을 등록하세요.',
+      'info',
+    );
+  }
+
   viewer.imageryLayers.removeAll();
 
   try {
-    viewer.imageryLayers.addImageryProvider(createVWorldImageryProvider('Base'));
+    const provider = createVWorldImageryProvider('Base');
+    viewer.imageryLayers.addImageryProvider(provider);
+
+    provider.errorEvent.addEventListener(() => {
+      showBanner('VWorld 지도 타일을 불러오지 못했습니다. 인증키 도메인 설정을 확인하세요.');
+    });
   } catch (error) {
-    showMapError(error.message ?? 'VWorld 지도를 불러오지 못했습니다.');
+    showBanner(error.message ?? 'VWorld 지도를 불러오지 못했습니다.');
   }
 
   setTerrainEnabled(viewer, true);
 
-  viewer.camera.flyTo({
-    destination: Cartesian3.fromDegrees(127.0276, 37.4979, 500000),
+  viewer.camera.setView({
+    destination: Cartesian3.fromDegrees(127.0276, 37.4979, 1200000),
     orientation: {
       heading: CesiumMath.toRadians(0),
-      pitch: CesiumMath.toRadians(-45),
+      pitch: CesiumMath.toRadians(-60),
+      roll: 0,
     },
   });
 }
