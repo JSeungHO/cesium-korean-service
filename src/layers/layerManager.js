@@ -1,7 +1,12 @@
 import { EllipsoidTerrainProvider, Terrain } from 'cesium';
 import { createVWorldImageryProvider } from './vworld.js';
 
-export { createVWorldImageryProvider, isLocalDevelopment, VWORLD_LAYER_OPTIONS } from './vworld.js';
+export {
+  createVWorldImageryProvider,
+  isLocalDevelopment,
+  verifyVWorldAccess,
+  VWORLD_LAYER_OPTIONS,
+} from './vworld.js';
 
 export function switchVWorldBaseMap(viewer, layerName) {
   const imageryLayers = viewer.imageryLayers;

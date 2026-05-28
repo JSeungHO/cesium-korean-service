@@ -10,6 +10,7 @@ import {
   createVWorldImageryProvider,
   isLocalDevelopment,
   setTerrainEnabled,
+  verifyVWorldAccess,
 } from './layers/layerManager.js';
 import { createLayerPanel } from './ui/layerPanel.js';
 import './style.css';
@@ -83,6 +84,12 @@ function init() {
       roll: 0,
     },
     duration: 0,
+  });
+
+  verifyVWorldAccess('Base').then((result) => {
+    if (!result.ok) {
+      showBanner(result.message);
+    }
   });
 }
 
