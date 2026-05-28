@@ -75,13 +75,14 @@ function init() {
 
   setTerrainEnabled(viewer, true);
 
-  viewer.camera.setView({
-    destination: Cartesian3.fromDegrees(127.0276, 37.4979, 1200000),
+  viewer.camera.flyTo({
+    destination: Cartesian3.fromDegrees(127.5, 36.2, 650000),
     orientation: {
       heading: CesiumMath.toRadians(0),
-      pitch: CesiumMath.toRadians(-60),
+      pitch: CesiumMath.toRadians(-55),
       roll: 0,
     },
+    duration: 0,
   });
 }
 

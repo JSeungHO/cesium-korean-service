@@ -1,5 +1,6 @@
 import {
   Credit,
+  Rectangle,
   UrlTemplateImageryProvider,
   WebMercatorTilingScheme,
 } from 'cesium';
@@ -76,7 +77,7 @@ export function createVWorldImageryProvider(layerName = 'Base') {
   return new UrlTemplateImageryProvider({
     url: `${baseUrl}/${apiKey}/${layer.type}/{z}/{y}/{x}.${layer.format}`,
     tilingScheme: new WebMercatorTilingScheme(),
-    minimumLevel: 6,
+    rectangle: Rectangle.fromDegrees(124.0, 33.0, 132.5, 39.5),
     maximumLevel: 19,
     credit: new Credit('© VWorld'),
   });
