@@ -50,6 +50,12 @@ export const VWORLD_LAYERS = Object.fromEntries(
   VWORLD_LAYER_OPTIONS.map((layer) => [layer.id, layer]),
 );
 
+const VWORLD_MAX_LEVEL = 19;
+const VWORLD_TILE_MATRIX_LABELS = Array.from(
+  { length: VWORLD_MAX_LEVEL + 1 },
+  (_, level) => String(level),
+);
+
 function getVWorldApiKey() {
   const rawKey = import.meta.env.VITE_VWORLD_API_KEY;
   return rawKey?.replace(/^['"]|['"]$/g, '').trim();
@@ -79,7 +85,9 @@ export function createVWorldImageryProvider(layerName = 'Base') {
     layer: layer.type,
     style: 'default',
     format: layer.format === 'jpeg' ? 'image/jpeg' : 'image/png',
-    maximumLevel: 19,
+    tileMatrixSetID: 'EPSG:3857',
+    tileMatrixLabels: VWORLD_TILE_MATRIX_LABELS,
+    maximumLevel: VWORLD_MAX_LEVEL,
     credit: new Credit('© VWorld'),
   });
 }
