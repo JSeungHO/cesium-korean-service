@@ -1,6 +1,7 @@
 import {
   Credit,
-  WebMapTileServiceImageryProvider,
+  UrlTemplateImageryProvider,
+  WebMercatorTilingScheme,
 } from 'cesium';
 
 export const VWORLD_LAYER_OPTIONS = [
@@ -50,12 +51,6 @@ export const VWORLD_LAYERS = Object.fromEntries(
   VWORLD_LAYER_OPTIONS.map((layer) => [layer.id, layer]),
 );
 
-const VWORLD_MAX_LEVEL = 19;
-const VWORLD_TILE_MATRIX_LABELS = Array.from(
-  { length: VWORLD_MAX_LEVEL + 1 },
-  (_, level) => String(level),
-);
-
 function getVWorldApiKey() {
   const rawKey = import.meta.env.VITE_VWORLD_API_KEY;
   return rawKey?.replace(/^['"]|['"]$/g, '').trim();
@@ -63,7 +58,7 @@ function getVWorldApiKey() {
 
 function getVWorldTileUrl(layer) {
   const apiKey = getVWorldApiKey();
-  const path = `/req/wmts/1.0.0/${apiKey}/${layer.type}/{TileMatrix}/{TileRow}/{TileCol}.${layer.format}`;
+  const path = `/req/wmts/1.0.0/${apiKey}/${layer.type}/{z}/{y}/{x}.${layer.format}`;
 
   if (import.meta.env.DEV) {
     return `/vworld${path}`;
@@ -80,14 +75,10 @@ export function createVWorldImageryProvider(layerName = 'Base') {
 
   const layer = VWORLD_LAYERS[layerName] ?? VWORLD_LAYERS.Base;
 
-  return new WebMapTileServiceImageryProvider({
+  return new UrlTemplateImageryProvider({
     url: getVWorldTileUrl(layer),
-    layer: layer.type,
-    style: 'default',
-    format: layer.format === 'jpeg' ? 'image/jpeg' : 'image/png',
-    tileMatrixSetID: 'EPSG:3857',
-    tileMatrixLabels: VWORLD_TILE_MATRIX_LABELS,
-    maximumLevel: VWORLD_MAX_LEVEL,
+    tilingScheme: new WebMercatorTilingScheme(),
+    maximumLevel: 19,
     credit: new Credit('© VWorld'),
   });
 }
@@ -106,31 +97,33 @@ export async function verifyVWorldAccess(layerName = 'Base') {
   }
 
   const testUrl = import.meta.env.DEV
-    ? `/vworld/req/wmts/1.0.0/${apiKey}/${layer.type}/8/218/99.${layer.format}`
-    : `https://api.vworld.kr/req/wmts/1.0.0/${apiKey}/${layer.type}/8/218/99.${layer.format}`;
+    ? `/vworld/req/wmts/1.0.0/${apiKey}/${layer.type}/8/99/218.${layer.format}`
+    : `https://api.vworld.kr/req/wmts/1.0.0/${apiKey}/${layer.type}/8/99/218.${layer.format}`;
 
   try {
     const response = await fetch(testUrl);
+    const contentType = response.headers.get('content-type') ?? '';
 
-    if (response.ok) {
+    if (response.ok && contentType.includes('image')) {
       return { ok: true };
     }
 
-    if (response.status === 403 || response.status === 401) {
-      return {
-        ok: false,
-        message: 'VWorld 인증 실패: 서비스 URL 또는 인증키 만료를 확인하세요.',
-      };
+    const body = await response.text();
+    const match = body.match(/<!\[CDATA\[(.*?)\]\]>/);
+    const reason = match?.[1];
+
+    if (reason) {
+      return { ok: false, message: `VWorld API 오류: ${reason}` };
     }
 
     return {
       ok: false,
-      message: `VWorld API 응답 오류 (${response.status}). 인증키 연장/재발급이 필요할 수 있습니다.`,
+      message: `VWorld API 응답 오류 (${response.status}).`,
     };
   } catch {
     return {
       ok: false,
-      message: 'VWorld API에 연결할 수 없습니다. 네트워크 또는 API 상태를 확인하세요.',
+      message: 'VWorld API에 연결할 수 없습니다.',
     };
   }
 }
