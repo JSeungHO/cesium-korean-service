@@ -3,13 +3,18 @@ import {
   EllipsoidTerrainProvider,
 } from 'cesium';
 import { createVWorldImageryProvider } from './vworld.js';
+import { setBuildingsEnabled, setCadastralEnabled } from './overlays.js';
 
 export {
+  createVWorldCadastralProvider,
   createVWorldImageryProvider,
+  getVWorldDomain,
   isLocalDevelopment,
   verifyVWorldAccess,
   VWORLD_LAYER_OPTIONS,
 } from './vworld.js';
+
+export { setBuildingsEnabled, setCadastralEnabled } from './overlays.js';
 
 export function switchVWorldBaseMap(viewer, layerName) {
   const imageryLayers = viewer.imageryLayers;
@@ -47,17 +52,15 @@ export const OVERLAY_LAYERS = [
   {
     id: 'buildings',
     label: '건물 3D',
-    description: 'OSM Buildings (준비 중)',
+    description: 'Cesium Ion OSM Buildings',
     defaultEnabled: false,
-    disabled: true,
     group: 'data',
   },
   {
     id: 'cadastral',
     label: '지적도',
-    description: 'VWorld WMS (준비 중)',
+    description: 'VWorld WMS 연속지적도',
     defaultEnabled: false,
-    disabled: true,
     group: 'data',
   },
 ];

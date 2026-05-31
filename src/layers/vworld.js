@@ -2,6 +2,7 @@ import {
   Credit,
   Rectangle,
   UrlTemplateImageryProvider,
+  WebMapServiceImageryProvider,
   WebMercatorTilingScheme,
 } from 'cesium';
 
@@ -60,6 +61,31 @@ function getVWorldApiKey() {
   return rawKey?.replace(/^['"]|['"]$/g, '').trim();
 }
 
+export function getVWorldDomain() {
+  const configured = import.meta.env.VITE_VWORLD_DOMAIN?.replace(
+    /^['"]|['"]$/g,
+    '',
+  ).trim();
+
+  if (configured) {
+    return configured.endsWith('/') ? configured : `${configured}/`;
+  }
+
+  if (import.meta.env.DEV) {
+    return 'https://cesium-korean-service.vercel.app/';
+  }
+
+  return `${window.location.origin}/`;
+}
+
+function getVWorldWmsUrl() {
+  if (import.meta.env.DEV) {
+    return '/vworld/req/wms';
+  }
+
+  return 'https://api.vworld.kr/req/wms';
+}
+
 function getVWorldTileUrl(layer) {
   const apiKey = getVWorldApiKey();
   const path = `/req/wmts/1.0.0/${apiKey}/${layer.type}/{z}/{y}/{x}.${layer.format}`;
@@ -86,6 +112,30 @@ export function createVWorldImageryProvider(layerName = 'Base') {
     maximumLevel: 19,
     rectangle: VWORLD_COVERAGE,
     credit: new Credit('© VWorld'),
+  });
+}
+
+export function createVWorldCadastralProvider() {
+  const apiKey = getVWorldApiKey();
+  if (!apiKey) {
+    throw new Error('VITE_VWORLD_API_KEY 환경 변수가 설정되지 않았습니다.');
+  }
+
+  return new WebMapServiceImageryProvider({
+    url: getVWorldWmsUrl(),
+    layers: 'lp_pa_cbnd_bonbun,lp_pa_cbnd_bubun',
+    parameters: {
+      key: apiKey,
+      domain: getVWorldDomain(),
+      transparent: true,
+      format: 'image/png',
+      version: '1.3.0',
+      styles: 'lp_pa_cbnd_bonbun_line,lp_pa_cbnd_bubun_line',
+    },
+    crs: 'EPSG:3857',
+    enablePickFeatures: false,
+    rectangle: VWORLD_COVERAGE,
+    credit: new Credit('© VWorld 지적도'),
   });
 }
 

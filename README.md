@@ -8,6 +8,8 @@ VWorld(브이월드) 배경지도와 Cesium World Terrain을 사용하는 한국
 
 - **VWorld WMTS 배경지도** — 일반, 위성, 하이브리드, 회색, 미드나잇 5종 전환
 - **Cesium World Terrain** — 3D 지형 on/off
+- **OSM Buildings 3D** — Cesium Ion 건물 타일셋 on/off
+- **VWorld 지적도 WMS** — 연속지적도 경계 오버레이 on/off
 - **레이어 패널** — 우측 UI에서 지도·오버레이 제어
 - **한국 초기 뷰** — 경도 127.5°, 위도 36.2° (대한민국 중부) 기준 카메라
 
@@ -29,7 +31,7 @@ VWorld(브이월드) 배경지도와 Cesium World Terrain을 사용하는 한국
 2. **서비스 URL**에 사용할 도메인 등록
    - 로컬: `http://localhost:5173`
    - 배포: `https://cesium-korean-service.vercel.app/` (또는 본인 도메인)
-3. **WMTS / 2D 지도** API 사용 설정
+3. **WMTS / WMS / 2D 지도** API 사용 설정
 
 ### 2. Cesium Ion 액세스 토큰
 
@@ -84,7 +86,8 @@ cesium-korean-service/
     ├── main.js             # Viewer 초기화, 카메라, Ion/VWorld 설정
     ├── style.css           # 레이어 패널·배너 스타일
     ├── layers/
-    │   ├── vworld.js       # VWorld WMTS ImageryProvider
+    │   ├── vworld.js       # VWorld WMTS·WMS ImageryProvider
+    │   ├── overlays.js     # OSM Buildings, 지적도 오버레이
     │   └── layerManager.js # 지도 전환, 3D 지형, 오버레이 정의
     └── ui/
         └── layerPanel.js   # 우측 레이어 패널 UI

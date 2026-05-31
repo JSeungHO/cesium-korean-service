@@ -1,6 +1,8 @@
 import {
   OVERLAY_GROUPS,
   OVERLAY_LAYERS,
+  setBuildingsEnabled,
+  setCadastralEnabled,
   setTerrainEnabled,
   switchVWorldBaseMap,
   VWORLD_LAYER_OPTIONS,
@@ -21,6 +23,26 @@ function createElement(tag, className, html) {
     element.innerHTML = html;
   }
   return element;
+}
+
+function createCollapsibleSection(title, icon, options = {}) {
+  const { open = true, compact = false } = options;
+  const section = createElement('details', 'layer-panel__section');
+  section.open = open;
+  if (compact) {
+    section.classList.add('layer-panel__section--compact');
+  }
+
+  const summary = createElement('summary', 'layer-panel__section-summary');
+  summary.innerHTML = `
+    <span class="layer-panel__section-icon">${icon}</span>
+    <span class="layer-panel__section-title">${title}</span>
+    <span class="layer-panel__section-chevron" aria-hidden="true"></span>
+  `;
+
+  const body = createElement('div', 'layer-panel__section-body');
+  section.append(summary, body);
+  return { section, body };
 }
 
 function groupOverlayLayers(layers) {
@@ -60,21 +82,15 @@ export function createLayerPanel(viewer, options = {}) {
       <span class="layer-panel__icon">${ICONS.layers}</span>
       <div>
         <h2 class="layer-panel__title">레이어</h2>
-        <p class="layer-panel__subtitle">지도 및 공간 데이터</p>
       </div>
     </div>
   `;
 
-  const mapSection = createElement('section', 'layer-panel__section');
-  mapSection.innerHTML = `
-    <div class="layer-panel__section-header">
-      <span class="layer-panel__section-icon">${ICONS.map}</span>
-      <div>
-        <h3 class="layer-panel__section-title">지도 변경</h3>
-        <p class="layer-panel__section-desc">VWorld 배경지도</p>
-      </div>
-    </div>
-  `;
+  const { section: mapSection, body: mapSectionBody } = createCollapsibleSection(
+    '지도 변경',
+    ICONS.map,
+    { open: true, compact: true },
+  );
 
   const mapGrid = createElement('div', 'layer-panel__map-grid');
   const mapButtons = new Map();
@@ -85,9 +101,8 @@ export function createLayerPanel(viewer, options = {}) {
     button.dataset.layerId = layer.id;
     button.setAttribute('aria-pressed', String(layer.id === activeBaseMap));
     button.innerHTML = `
-      <span class="layer-panel__map-preview" style="background:${layer.preview}"></span>
+      <span class="layer-panel__map-swatch" style="background:${layer.preview}"></span>
       <span class="layer-panel__map-label">${layer.label}</span>
-      <span class="layer-panel__map-desc">${layer.description}</span>
     `;
 
     button.addEventListener('click', () => {
@@ -105,18 +120,13 @@ export function createLayerPanel(viewer, options = {}) {
     mapGrid.appendChild(button);
   });
 
-  mapSection.appendChild(mapGrid);
+  mapSectionBody.appendChild(mapGrid);
 
-  const overlaySection = createElement('section', 'layer-panel__section');
-  overlaySection.innerHTML = `
-    <div class="layer-panel__section-header">
-      <span class="layer-panel__section-icon">${ICONS.layers}</span>
-      <div>
-        <h3 class="layer-panel__section-title">오버레이</h3>
-        <p class="layer-panel__section-desc">추가 레이어 표시</p>
-      </div>
-    </div>
-  `;
+  const { section: overlaySection, body: overlaySectionBody } = createCollapsibleSection(
+    '오버레이',
+    ICONS.layers,
+    { open: true },
+  );
 
   const overlayList = createElement('div', 'layer-panel__overlay-list');
   const overlayInputs = new Map();
@@ -169,11 +179,11 @@ export function createLayerPanel(viewer, options = {}) {
     });
   });
 
-  overlaySection.appendChild(overlayList);
+  overlaySectionBody.appendChild(overlayList);
 
   const statusBar = createElement('div', 'layer-panel__status');
   statusBar.innerHTML = `
-    <span class="layer-panel__status-label">현재 지도</span>
+    <span class="layer-panel__status-label">현재</span>
     <strong class="layer-panel__status-value"></strong>
   `;
   const statusValue = statusBar.querySelector('.layer-panel__status-value');
@@ -246,7 +256,17 @@ export function createLayerPanel(viewer, options = {}) {
 }
 
 async function applyOverlayLayer(viewer, layerId, enabled) {
-  if (layerId === 'terrain') {
-    await setTerrainEnabled(viewer, enabled);
+  switch (layerId) {
+    case 'terrain':
+      await setTerrainEnabled(viewer, enabled);
+      break;
+    case 'buildings':
+      await setBuildingsEnabled(viewer, enabled);
+      break;
+    case 'cadastral':
+      setCadastralEnabled(viewer, enabled);
+      break;
+    default:
+      break;
   }
 }
