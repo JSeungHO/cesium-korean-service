@@ -46,7 +46,7 @@ export const OVERLAY_LAYERS = [
     id: 'terrain',
     label: '3D 지형',
     description: 'Cesium World Terrain',
-    defaultEnabled: true,
+    defaultEnabled: false,
     group: 'terrain',
   },
   {

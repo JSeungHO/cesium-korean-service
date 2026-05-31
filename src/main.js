@@ -9,7 +9,6 @@ import 'cesium/Build/Cesium/Widgets/widgets.css';
 import {
   createVWorldImageryProvider,
   isLocalDevelopment,
-  setTerrainEnabled,
   verifyVWorldAccess,
 } from './layers/layerManager.js';
 import { createLayerPanel } from './ui/layerPanel.js';
@@ -73,12 +72,6 @@ async function init() {
       '로컬 개발 모드: VWorld 타일은 dev 프록시로 요청합니다. 지도가 비어 있으면 VWorld 인증키에 http://localhost:5173 을 등록하세요.',
       'info',
     );
-  }
-
-  try {
-    await setTerrainEnabled(viewer, true);
-  } catch {
-    showBanner('Cesium World Terrain을 불러오지 못했습니다. Ion 토큰을 확인하세요.');
   }
 
   viewer.camera.setView({

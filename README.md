@@ -7,7 +7,7 @@ VWorld(브이월드) 배경지도와 Cesium World Terrain을 사용하는 한국
 ## 주요 기능
 
 - **VWorld WMTS 배경지도** — 일반, 위성, 하이브리드, 회색, 미드나잇 5종 전환
-- **Cesium World Terrain** — 3D 지형 on/off
+- **Cesium World Terrain** — 3D 지형 on/off (기본 OFF, Ion 사용량 절약)
 - **OSM Buildings 3D** — Cesium Ion 건물 타일셋 on/off
 - **VWorld 지적도 WMS** — 연속지적도 경계 오버레이 on/off
 - **레이어 패널** — 우측 UI에서 지도·오버레이 제어
