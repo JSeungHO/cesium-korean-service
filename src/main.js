@@ -1,8 +1,8 @@
 import {
   Cartesian3,
+  ImageryLayer,
   Ion,
   Math as CesiumMath,
-  Terrain,
   Viewer,
 } from 'cesium';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
@@ -29,14 +29,28 @@ function showBanner(message, type = 'error') {
   root.prepend(banner);
 }
 
-function init() {
-  Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_TOKEN?.replace(
+async function init() {
+  const ionToken = import.meta.env.VITE_CESIUM_ION_TOKEN?.replace(
     /^['"]|['"]$/g,
     '',
   ).trim();
 
+  if (!ionToken) {
+    showBanner('VITE_CESIUM_ION_TOKEN이 설정되지 않았습니다.');
+  } else {
+    Ion.defaultAccessToken = ionToken;
+  }
+
+  let baseProvider;
+  try {
+    baseProvider = createVWorldImageryProvider('Base');
+  } catch (error) {
+    showBanner(error.message ?? 'VWorld 지도를 불러오지 못했습니다.');
+    return;
+  }
+
   const viewer = new Viewer('cesiumContainer', {
-    terrain: Terrain.fromWorldTerrain(),
+    baseLayer: new ImageryLayer(baseProvider),
     baseLayerPicker: false,
     animation: false,
     timeline: false,
@@ -61,36 +75,25 @@ function init() {
     );
   }
 
-  viewer.imageryLayers.removeAll();
-
   try {
-    const provider = createVWorldImageryProvider('Base');
-    viewer.imageryLayers.addImageryProvider(provider);
-
-    provider.errorEvent.addEventListener(() => {
-      showBanner('VWorld 지도 타일을 불러오지 못했습니다. 인증키 도메인 설정을 확인하세요.');
-    });
-  } catch (error) {
-    showBanner(error.message ?? 'VWorld 지도를 불러오지 못했습니다.');
+    await setTerrainEnabled(viewer, true);
+  } catch {
+    showBanner('Cesium World Terrain을 불러오지 못했습니다. Ion 토큰을 확인하세요.');
   }
 
-  setTerrainEnabled(viewer, true);
-
-  viewer.camera.flyTo({
-    destination: Cartesian3.fromDegrees(127.5, 36.2, 650000),
+  viewer.camera.setView({
+    destination: Cartesian3.fromDegrees(127.5, 36.2, 120000),
     orientation: {
       heading: CesiumMath.toRadians(0),
-      pitch: CesiumMath.toRadians(-55),
+      pitch: CesiumMath.toRadians(-45),
       roll: 0,
     },
-    duration: 0,
   });
 
-  verifyVWorldAccess('Base').then((result) => {
-    if (!result.ok) {
-      showBanner(result.message);
-    }
-  });
+  const access = await verifyVWorldAccess('Base');
+  if (!access.ok) {
+    showBanner(access.message);
+  }
 }
 
 init();

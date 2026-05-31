@@ -1,8 +1,12 @@
 import {
   Credit,
+  Rectangle,
   UrlTemplateImageryProvider,
   WebMercatorTilingScheme,
 } from 'cesium';
+
+// VWorld WMTS는 줌 6~19, 한국 영역만 제공합니다.
+const VWORLD_COVERAGE = Rectangle.fromDegrees(124.6, 33.0, 131.9, 38.7);
 
 export const VWORLD_LAYER_OPTIONS = [
   {
@@ -78,7 +82,9 @@ export function createVWorldImageryProvider(layerName = 'Base') {
   return new UrlTemplateImageryProvider({
     url: getVWorldTileUrl(layer),
     tilingScheme: new WebMercatorTilingScheme(),
+    minimumLevel: 6,
     maximumLevel: 19,
+    rectangle: VWORLD_COVERAGE,
     credit: new Credit('© VWorld'),
   });
 }

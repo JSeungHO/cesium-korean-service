@@ -148,10 +148,20 @@ export function createLayerPanel(viewer, options = {}) {
         <small>${layer.description}</small>
       `));
 
-      input.addEventListener('change', () => {
+      input.addEventListener('change', async () => {
         overlayState.set(layer.id, input.checked);
-        applyOverlayLayer(viewer, layer.id, input.checked);
-        onOverlayChange?.(layer.id, input.checked);
+        input.disabled = true;
+
+        try {
+          await applyOverlayLayer(viewer, layer.id, input.checked);
+          onOverlayChange?.(layer.id, input.checked);
+        } catch (error) {
+          input.checked = !input.checked;
+          overlayState.set(layer.id, input.checked);
+          console.error(error);
+        } finally {
+          input.disabled = Boolean(layer.disabled);
+        }
       });
 
       overlayInputs.set(layer.id, input);
@@ -235,8 +245,8 @@ export function createLayerPanel(viewer, options = {}) {
   };
 }
 
-function applyOverlayLayer(viewer, layerId, enabled) {
+async function applyOverlayLayer(viewer, layerId, enabled) {
   if (layerId === 'terrain') {
-    setTerrainEnabled(viewer, enabled);
+    await setTerrainEnabled(viewer, enabled);
   }
 }

@@ -1,4 +1,7 @@
-import { EllipsoidTerrainProvider, Terrain } from 'cesium';
+import {
+  createWorldTerrainAsync,
+  EllipsoidTerrainProvider,
+} from 'cesium';
 import { createVWorldImageryProvider } from './vworld.js';
 
 export {
@@ -20,9 +23,17 @@ export function switchVWorldBaseMap(viewer, layerName) {
 }
 
 export async function setTerrainEnabled(viewer, enabled) {
-  viewer.terrainProvider = enabled
-    ? Terrain.fromWorldTerrain()
-    : new EllipsoidTerrainProvider();
+  const globe = viewer.scene.globe;
+
+  if (!enabled) {
+    globe.depthTestAgainstTerrain = false;
+    viewer.terrainProvider = new EllipsoidTerrainProvider();
+    return;
+  }
+
+  const terrainProvider = await createWorldTerrainAsync();
+  globe.depthTestAgainstTerrain = true;
+  viewer.terrainProvider = terrainProvider;
 }
 
 export const OVERLAY_LAYERS = [
