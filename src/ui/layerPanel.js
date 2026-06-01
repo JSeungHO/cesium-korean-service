@@ -7,10 +7,13 @@ import {
   switchVWorldBaseMap,
   VWORLD_LAYER_OPTIONS,
 } from '../layers/layerManager.js';
+import { LOCATION_PRESETS } from '../locations/korea.js';
+import { flyToLocation as flyCameraToLocation } from '../utils/flyTo.js';
 
 const ICONS = {
   layers: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 7l9 5 9-5-9-5Zm0 7L3 14l9 5 9-5-9-5Zm0 7-9-5v2l9 5 9-5v-2l-9 5-9-5Z"/></svg>`,
   map: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6-2-6 2v13l6-2 6 2 6-2V4l-6 2Zm-6 11-4 1.3V5.3L9 4v13Zm2 0V4l4 1.3v12.7l-4-1.3Zm8 0-4 1.3V5.3L19 4v13Z"/></svg>`,
+  pin: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>`,
   chevron: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>`,
 };
 
@@ -122,6 +125,31 @@ export function createLayerPanel(viewer, options = {}) {
 
   mapSectionBody.appendChild(mapGrid);
 
+  const { section: locationSection, body: locationSectionBody } = createCollapsibleSection(
+    '빠른 이동',
+    ICONS.pin,
+    { open: true, compact: true },
+  );
+
+  const locationGrid = createElement('div', 'layer-panel__location-grid');
+
+  LOCATION_PRESETS.forEach((location) => {
+    const button = createElement('button', 'layer-panel__location-option');
+    button.type = 'button';
+    button.title = location.description ?? location.label;
+    button.innerHTML = `
+      <span class="layer-panel__location-label">${location.label}</span>
+    `;
+
+    button.addEventListener('click', () => {
+      flyCameraToLocation(viewer, location);
+    });
+
+    locationGrid.appendChild(button);
+  });
+
+  locationSectionBody.appendChild(locationGrid);
+
   const { section: overlaySection, body: overlaySectionBody } = createCollapsibleSection(
     '오버레이',
     ICONS.layers,
@@ -188,7 +216,7 @@ export function createLayerPanel(viewer, options = {}) {
   `;
   const statusValue = statusBar.querySelector('.layer-panel__status-value');
 
-  content.append(header, mapSection, overlaySection, statusBar);
+  content.append(header, mapSection, locationSection, overlaySection, statusBar);
   panel.append(toggleButton, content);
   mount.appendChild(panel);
 
@@ -245,6 +273,15 @@ export function createLayerPanel(viewer, options = {}) {
       }
       input.checked = enabled;
       overlayState.set(layerId, enabled);
+    },
+    flyTo(location) {
+      flyCameraToLocation(viewer, location);
+    },
+    flyToPreset(locationId) {
+      const preset = LOCATION_PRESETS.find((item) => item.id === locationId);
+      if (preset) {
+        flyCameraToLocation(viewer, preset);
+      }
     },
     open() {
       setCollapsed(false);

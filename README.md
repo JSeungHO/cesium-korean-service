@@ -11,6 +11,7 @@ VWorld(브이월드) 배경지도와 Cesium World Terrain을 사용하는 한국
 - **OSM Buildings 3D** — Cesium Ion 건물 타일셋 on/off
 - **VWorld 지적도 WMS** — 연속지적도 경계 오버레이 on/off
 - **레이어 패널** — 우측 UI에서 지도·오버레이 제어
+- **빠른 이동** — 한국 전역, 서울, 강남역, 부산, 제주 프리셋 카메라
 - **한국 초기 뷰** — 경도 127.5°, 위도 36.2° (대한민국 중부) 기준 카메라
 
 ## 기술 스택
@@ -52,6 +53,9 @@ npm run dev
 # 프로덕션 빌드
 npm run build
 
+# 단위 테스트
+npm test
+
 # 빌드 결과 미리보기
 npm run preview
 ```
@@ -89,6 +93,10 @@ cesium-korean-service/
     │   ├── vworld.js       # VWorld WMTS·WMS ImageryProvider
     │   ├── overlays.js     # OSM Buildings, 지적도 오버레이
     │   └── layerManager.js # 지도 전환, 3D 지형, 오버레이 정의
+    ├── locations/
+    │   └── korea.js        # 빠른 이동 카메라 프리셋
+    ├── utils/
+    │   └── flyTo.js        # Cesium flyTo helper
     └── ui/
         └── layerPanel.js   # 우측 레이어 패널 UI
 ```

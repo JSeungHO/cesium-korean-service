@@ -6,6 +6,9 @@ const cesiumBaseUrl = 'cesiumStatic';
 const vworldReferer = 'https://cesium-korean-service.vercel.app/';
 
 export default defineConfig({
+  test: {
+    environment: 'node',
+  },
   define: {
     CESIUM_BASE_URL: JSON.stringify(`/${cesiumBaseUrl}`),
   },
