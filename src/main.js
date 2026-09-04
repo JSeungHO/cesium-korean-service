@@ -69,7 +69,7 @@ async function init() {
 
   if (isLocalDevelopment()) {
     showBanner(
-      '로컬 개발 모드: VWorld 타일은 dev 프록시로 요청합니다. 지도가 비어 있으면 VWorld 인증키에 http://localhost:5173 을 등록하세요.',
+      '로컬 개발 모드: VWorld 타일은 dev 프록시로 요청합니다. 지도가 비어 있으면 VWorld 인증키에 현재 URL을 등록하세요.',
       'info',
     );
   }

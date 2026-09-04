@@ -2,6 +2,12 @@
 
 VWorld(브이월드) 배경지도와 Cesium World Terrain을 사용하는 한국 중심 3D 지도 웹 애플리케이션입니다.
 
+## 왜 이 프로젝트가 필요한가
+
+국내 GIS·방재 프로젝트를 CesiumJS로 시작할 때마다 VWorld 연동, 한국 좌표계 초기 뷰 설정, 지형·건물 타일셋 세팅을 매번 처음부터 반복하게 됩니다. 이 저장소는 그 초기 세팅을 한 번 표준화해 둔 재사용 가능한 스타터킷입니다. 클론 후 API 키만 넣으면 VWorld 5종 배경지도 전환, 한국 중부 기준 카메라, 3D 지형·OSM 건물·지적도 오버레이가 바로 동작하므로, 매 프로젝트의 반복 작업을 건너뛰고 실제 도메인 기능부터 시작할 수 있습니다.
+
+![데모 — VWorld 배경지도 전환, 3D 지형·건물, 빠른 이동](docs/demo.gif)
+
 **데모:** https://cesium-korean-service.vercel.app
 
 ## 주요 기능
@@ -76,7 +82,7 @@ VITE_CESIUM_ION_TOKEN=your-cesium-ion-token
 
 > `VITE_` 접두사 변수는 **클라이언트 번들에 포함**됩니다. 공개 저장소에 실제 키를 커밋하지 마세요.
 
-로컬 개발 시 VWorld 타일은 Vite dev 프록시(`/vworld` → `api.vworld.kr`)를 통해 요청됩니다. VWorld 인증키에 `http://localhost:5173`이 등록되어 있어야 합니다.
+로컬 개발 시 VWorld 타일은 Vite dev 프록시(`/vworld` → `api.vworld.kr`)를 통해 요청됩니다. VWorld 인증키에 URL이 등록되어 있어야 합니다.
 
 ## 프로젝트 구조
 
